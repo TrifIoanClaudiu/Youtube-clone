@@ -1,0 +1,1 @@
+export const initialRoute = "http://localhost:8800/api/";

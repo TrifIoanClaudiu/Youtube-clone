@@ -1,6 +1,9 @@
 import React from 'react'
+import axios from "axios"
 import styled from 'styled-components'
 import Card from '../components/Card'
+import {initialRoute} from "../utils/route"
+import { useState, useEffect } from "react";
 
 const Container = styled.div`
   display: flex;
@@ -9,37 +12,22 @@ const Container = styled.div`
 `;
 
 const Home = () => {
+
+  const [videos, setVideos] = useState([]);
+
+  useEffect(()=>{
+    const fetchVideos = async () => {
+        const res = await axios.get(initialRoute +"videos/random");
+        setVideos(res.data);
+    }
+
+    fetchVideos();
+  }, [])
   return (
     <Container>
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
+        {videos.map((video) => {
+          return <Card />
+        })}
     </Container>
   )
 }
