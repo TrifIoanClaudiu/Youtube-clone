@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  currentUser: null,
+  currentVideo: null,
   loading: false,
   error: false,
 };
@@ -10,38 +10,43 @@ export const videoSlice = createSlice({
   name: "video",
   initialState,
   reducers: {
-    loginStart: (state) => {
+    fetchStart: (state) => {
       state.loading = true;
     },
-    loginSucces: (state, action) => {
+    fetchSuccess: (state, action) => {
       state.loading = false;
-      state.currentUser = action.payload;
+      state.currentVideo = action.payload;
     },
-    loginFailure: (state) => {
+    fetchFailure: (state) => {
       state.loading = false;
       state.error = true;
     },
-    logout: (state) => {
-      state.currentUser = null;
-      state.loading = false;
-      state.error = false;
-    },
-    subscription: (state, action) => {
-      if (state.currentUser.subscribedUsers.includes(action.payload)) {
-        state.currentUser.subscribedUsers.splice(
-          state.currentUser.subscribedUsers.findIndex(
-            (channelId) => channelId === action.payload
+    like: (state, action) => {
+      if (!state.currentVideo.likes.includes(action.payload)) {
+        state.currentVideo.likes.push(action.payload);
+        state.currentVideo.dislikes.splice(
+          state.currentVideo.dislikes.findIndex(
+            (userId) => userId === action.payload
           ),
           1
         );
-      } else {
-        state.currentUser.subscribedUsers.push(action.payload);
+      }
+    },
+    dislike: (state, action) => {
+      if (!state.currentVideo.dislikes.includes(action.payload)) {
+        state.currentVideo.dislikes.push(action.payload);
+        state.currentVideo.likes.splice(
+          state.currentVideo.likes.findIndex(
+            (userId) => userId === action.payload
+          ),
+          1
+        );
       }
     },
   },
 });
 
-export const { loginStart, loginSucces, loginFailure, logout, subscription } =
+export const { fetchStart, fetchSuccess, fetchFailure, like, dislike } =
   videoSlice.actions;
 
 export default videoSlice.reducer;

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import ThumbUpAltOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
 import ThumbDownAltOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
@@ -6,6 +6,12 @@ import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
 import AddTaskOutlinedIcon from '@mui/icons-material/AddTaskOutlined';
 import Comments from '../components/Comments';
 import Card from '../components/Card';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import axios from "axios";
+import { initialRoute } from '../utils/route';
+import { fetchSuccess } from '../redux/videoSlice';
+import {format} from "timeago.js"
 
 const Container = styled.div`
   display: flex;
@@ -105,8 +111,37 @@ const Subscribe = styled.button`
 `;
 
 const Video = () => {
+  const {currentUser} = useSelector((state)=> state.user);
+  const {currentVideo} = useSelector((state)=> state.video);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const path = useLocation().pathname.split("/")[2];
+
+  const [channel, setChannel] = useState({});
+ 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const videoRes = await axios.get(`http://localhost:8800/api/videos/find/${path}`);
+        const channelRes = await axios.get(initialRoute+
+          `users/find/${videoRes.data.userId}`
+          );
+        setChannel(channelRes.data);
+        dispatch(fetchSuccess(videoRes.data));
+        setIsLoading(false);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchData();
+  }, [path, dispatch]);
   return (
     <Container>
+      {!isLoading&&
       <Content>
         <VideoWrapper>
           <iframe
@@ -114,18 +149,20 @@ const Video = () => {
             height="720"
             src="https://www.youtube.com/embed/hK1iIKIMK5E"
             title="YouTube video player"
-            frameborder="0"
+            frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
+            allowFullScreen
           />
         </VideoWrapper>
-        <Title>Bruno Fernandes Tribute</Title>
+        <Title>{currentVideo.title}</Title>
         <Details>
-          <Info>7,948,154 views • Jun 22, 2022</Info>
+          <Info>
+            {currentVideo.views} views • {format(currentVideo.createdAt)}
+          </Info>
           <Buttons>
             <Button>
               <ThumbUpAltOutlinedIcon />
-              376261
+              {currentVideo.likes?.length}
             </Button>
             <Button>
               <ThumbDownAltOutlinedIcon />
@@ -143,25 +180,23 @@ const Video = () => {
         </Details>
         <Hr />
         <Channel>
-        <ChannelInfo>
-            <Image src="https://yt3.ggpht.com/yti/APfAmoE-Q0ZLJ4vk3vqmV4Kwp0sbrjxLyB8Q4ZgNsiRH=s88-c-k-c0x00ffffff-no-rj-mo" />
+          <ChannelInfo>
+            <Image src={channel.img} />
             <ChannelDetail>
-              <ChannelName>Lama Dev</ChannelName>
-              <ChannelCounter>200K subscribers</ChannelCounter>
+              <ChannelName>{channel.name}</ChannelName>
+              <ChannelCounter>{channel.subscribers} subscribers</ChannelCounter>
               <Description>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                Doloribus laborum delectus unde quaerat dolore culpa sit aliquam
-                at. Vitae facere ipsum totam ratione exercitationem. Suscipit
-                animi accusantium dolores ipsam ut.
+                {currentVideo.description}
               </Description>
             </ChannelDetail>
           </ChannelInfo>
           <Subscribe>SUBSCRIBE</Subscribe>
         </Channel>
         <Hr />
-        <Comments />
-      </Content>
+        <Comments videoId={currentVideo._id}/>
+      </Content>}
       <Recommendations>
+        {/* <Card type = "sm"/>
         <Card type = "sm"/>
         <Card type = "sm"/>
         <Card type = "sm"/>
@@ -171,8 +206,7 @@ const Video = () => {
         <Card type = "sm"/>
         <Card type = "sm"/>
         <Card type = "sm"/>
-        <Card type = "sm"/>
-        <Card type = "sm"/>
+        <Card type = "sm"/> */}
       </Recommendations>
     </Container>
   );

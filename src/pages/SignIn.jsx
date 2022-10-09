@@ -85,6 +85,7 @@ const SignIn = () => {
     try{
       const res = await axios.post(initialRoute+"auth/signin", {name, password});
       dispatch(loginSucces(res.data));
+      navigate("/");
     }catch(err){
       dispatch(loginFailure());
     }
