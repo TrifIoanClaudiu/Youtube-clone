@@ -2,15 +2,18 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import ThumbUpAltOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
 import ThumbDownAltOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
 import AddTaskOutlinedIcon from '@mui/icons-material/AddTaskOutlined';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import Comments from '../components/Comments';
 import Card from '../components/Card';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import axios from "axios";
 import { initialRoute } from '../utils/route';
-import { fetchSuccess } from '../redux/videoSlice';
+import { fetchSuccess, like, dislike } from '../redux/videoSlice';
+import { subscription } from '../redux/userSlice';
 import {format} from "timeago.js"
 
 const Container = styled.div`
@@ -139,6 +142,24 @@ const Video = () => {
 
     fetchData();
   }, [path, dispatch]);
+
+  const handleLike = async () => {
+    await axios.put(initialRoute + `users/like/${currentVideo._id}`);
+    console.log(initialRoute + `users/like/${currentVideo._id}`)
+    dispatch(like(currentUser._id));
+  };
+  const handleDislike = async () => {
+    await axios.put(initialRoute+ `users/dislike/${currentVideo._id}`);
+    dispatch(dislike(currentUser._id));
+  };
+
+  const handleSub = async () => {
+    currentUser.subscribedUsers.includes(channel._id)
+      ? await axios.put(initialRoute + `users/unsub/${channel._id}`)
+      : await axios.put(initialRoute + `users/sub/${channel._id}`);
+    dispatch(subscription(channel._id));
+  };
+
   return (
     <Container>
       {!isLoading&&
@@ -160,12 +181,12 @@ const Video = () => {
             {currentVideo.views} views • {format(currentVideo.createdAt)}
           </Info>
           <Buttons>
-            <Button>
-              <ThumbUpAltOutlinedIcon />
+            <Button onClick={handleLike}>
+              {currentVideo.likes?.includes(currentUser._id) ? <ThumbUpIcon /> :<ThumbUpAltOutlinedIcon />}
               {currentVideo.likes?.length}
             </Button>
-            <Button>
-              <ThumbDownAltOutlinedIcon />
+            <Button onClick={handleDislike}>
+              {currentVideo.dislikes?.includes(currentUser._id) ? <ThumbDownIcon /> :<ThumbDownAltOutlinedIcon />}
               Dislike
             </Button>
             <Button>
@@ -190,7 +211,7 @@ const Video = () => {
               </Description>
             </ChannelDetail>
           </ChannelInfo>
-          <Subscribe>SUBSCRIBE</Subscribe>
+          <Subscribe onClick={handleSub}>SUBSCRIBE</Subscribe>
         </Channel>
         <Hr />
         <Comments videoId={currentVideo._id}/>
