@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { loginFailure, loginStart, loginSucces } from "../redux/userSlice";
 import { auth, provider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
-import { async } from "@firebase/util";
 import { useNavigate } from "react-router-dom";
 import { initialRoute } from "../utils/route";
 const Container = styled.div`
@@ -110,8 +109,14 @@ const SignIn = () => {
       });
   };
 
-  //TODO: REGISTER FUNCTIONALITY
-
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(initialRoute + "auth/signup", { name, email, password });
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   return (
     <Container>
@@ -141,7 +146,7 @@ const SignIn = () => {
           placeholder="password"
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button>Sign up</Button>
+        <Button onClick={handleRegister}>Sign up</Button>
       </Wrapper>
       <More>
         English(USA)
