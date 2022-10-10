@@ -7,7 +7,6 @@ import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
 import AddTaskOutlinedIcon from '@mui/icons-material/AddTaskOutlined';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import Comments from '../components/Comments';
-import Card from '../components/Card';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import axios from "axios";
@@ -15,6 +14,7 @@ import { initialRoute } from '../utils/route';
 import { fetchSuccess, like, dislike } from '../redux/videoSlice';
 import { subscription } from '../redux/userSlice';
 import {format} from "timeago.js"
+import Recommendation from '../components/Recommendation';
 
 const Container = styled.div`
   display: flex;
@@ -222,17 +222,7 @@ const Video = () => {
         <Comments videoId={currentVideo._id}/>
       </Content>}
       <Recommendations>
-        {/* <Card type = "sm"/>
-        <Card type = "sm"/>
-        <Card type = "sm"/>
-        <Card type = "sm"/>
-        <Card type = "sm"/>
-        <Card type = "sm"/>
-        <Card type = "sm"/>
-        <Card type = "sm"/>
-        <Card type = "sm"/>
-        <Card type = "sm"/>
-        <Card type = "sm"/> */}
+        <Recommendation tags = {currentVideo.tags} />
       </Recommendations>
     </Container>
   );
