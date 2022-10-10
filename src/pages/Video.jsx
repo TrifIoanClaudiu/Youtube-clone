@@ -116,7 +116,7 @@ const Subscribe = styled.button`
 const Video = () => {
   const {currentUser} = useSelector((state)=> state.user);
   const {currentVideo} = useSelector((state)=> state.video);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const dispatch = useDispatch();
 
@@ -127,8 +127,7 @@ const Video = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
-        const videoRes = await axios.get(`http://localhost:8800/api/videos/find/${path}`);
+        const videoRes = await axios.get(initialRoute + `videos/find/${path}`);
         const channelRes = await axios.get(initialRoute+
           `users/find/${videoRes.data.userId}`
           );
@@ -143,26 +142,32 @@ const Video = () => {
     fetchData();
   }, [path, dispatch]);
 
+  const axiosInstance = axios.create({
+    withCredentials: true,
+    headers: {
+      "Content-type": "application/json",
+  },
+ })
+
   const handleLike = async () => {
-    await axios.put(initialRoute + `users/like/${currentVideo._id}`);
-    console.log(initialRoute + `users/like/${currentVideo._id}`)
+    await axiosInstance.put(initialRoute + `users/like/${currentVideo._id}`);
     dispatch(like(currentUser._id));
   };
   const handleDislike = async () => {
-    await axios.put(initialRoute+ `users/dislike/${currentVideo._id}`);
+    await axiosInstance.put(initialRoute+ `users/dislike/${currentVideo._id}`);
     dispatch(dislike(currentUser._id));
   };
 
   const handleSub = async () => {
     currentUser.subscribedUsers.includes(channel._id)
-      ? await axios.put(initialRoute + `users/unsub/${channel._id}`)
-      : await axios.put(initialRoute + `users/sub/${channel._id}`);
+      ? await axiosInstance.put(initialRoute + `users/unsub/${channel._id}`)
+      : await axiosInstance.put(initialRoute + `users/sub/${channel._id}`);
     dispatch(subscription(channel._id));
   };
 
   return (
     <Container>
-      {!isLoading&&
+      {!isLoading &&
       <Content>
         <VideoWrapper>
           <iframe

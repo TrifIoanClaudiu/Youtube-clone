@@ -1,14 +1,13 @@
-import React, { useState } from "react";
-import styled from "styled-components";
 import axios from "axios";
-import { initialRoute } from "../utils/route";
-import {useDispatch} from "react-redux"
-import { loginStart, loginFailure, loginSucces } from "../redux/userSlice";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import styled from "styled-components";
+import { loginFailure, loginStart, loginSucces } from "../redux/userSlice";
 import { auth, provider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
 import { async } from "@firebase/util";
 import { useNavigate } from "react-router-dom";
-
+import { initialRoute } from "../utils/route";
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -72,24 +71,23 @@ const Link = styled.span`
 `;
 
 const SignIn = () => {
-
-  const navigate = useNavigate()
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const dispatch = useDispatch();
+  const dispatch = useDispatch();  const navigate = useNavigate()
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
     dispatch(loginStart());
-    try{
-      const res = await axios.post(initialRoute+"auth/signin", {name, password});
+    try {
+      const res = await axios.post(initialRoute + "auth/signin", { name, password }, {withCredentials: true});
       dispatch(loginSucces(res.data));
       navigate("/");
-    }catch(err){
+    } catch (err) {
       dispatch(loginFailure());
     }
-  }
+  };
 
   const signInWithGoogle = async () => {
     dispatch(loginStart());
@@ -112,12 +110,14 @@ const SignIn = () => {
       });
   };
 
+  //TODO: REGISTER FUNCTIONALITY
+
 
   return (
     <Container>
       <Wrapper>
         <Title>Sign in</Title>
-        <SubTitle>to continue to YouTube</SubTitle>
+        <SubTitle>to continue to LamaTube</SubTitle>
         <Input
           placeholder="username"
           onChange={(e) => setName(e.target.value)}

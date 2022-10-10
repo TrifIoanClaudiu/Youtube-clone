@@ -10,7 +10,12 @@ import cors from "cors";
 
 const app = express();
 dotenv.config();
-app.use(cors());
+app.use(
+  cors({
+      credentials: true,
+      origin: "http://localhost:3000",
+  })
+);
 const connect = () => {
     mongoose
       .connect(process.env.DB_CONNECT)
